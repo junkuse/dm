@@ -26,30 +26,50 @@ items.sort()
 min_supp_perc = 0.3
 min_supp = int(min_supp_perc*len(data))
 
-def stage_k(items,records, minimum_support_count,k):
-    combi=list(combinations(items,k))
-    ck = {}
-    lk={}
-   
-    for iter1 in combi:
-        count = 0
-        for iter2 in records:
-            if set(iter1).issubset(set(iter2[1])):
-                count+=1
-        ck[iter1] = count
-       
-    for key, value in ck.items():
-        if value >= minimum_support_count:
-            lk[key] = value
-   
-    return ck, lk
+print(min_supp)
+c1,l1={},{}
+for itm in items:
+    c1[itm]=set()
 
-max_freq_size=max([len(i[1]) for i in data])
+for trans in data:
+    for itm in trans[1]:
+        c1[itm].add(trans[0])
+
+for itm in c1:
+    if(len(c1[itm])>=min_supp):
+        l1[itm]=c1[itm]
+
+print('C1')
+for itm,val in c1.items():
+    print(itm,":",val)
+
+print('L1')
+for itm,val in l1.items():
+    print(itm,":",val)
+print()
+
+def stagek(items,minimum_support_count,k,c1):
+    combi=list(combinations(items,k))
+
+    ck,lk={},{}
+    for iter1 in combi:
+        curr=c1[iter1[0]]
+        for itm in iter1:
+            curr=curr.intersection(c1[itm])
+        ck[iter1]=curr
+   
+    for itm in ck:
+        if(len(ck[itm])>=min_supp):
+            lk[itm]=ck[itm]
+   
+    return ck,lk
+
+max_freq_size=len(c1)
 l_last=None
 
 min_conf_perc = 0.5
-for i in range(1,max_freq_size+1):
-    ci,li=stage_k(items,data,min_supp,i)
+for i in range(2,max_freq_size+1):
+    ci,li=stagek(items,min_supp,i,c1)
    
     print('C%d' %(i))
     for itm,val in ci.items():
@@ -64,6 +84,7 @@ for i in range(1,max_freq_size+1):
        
     print()
     l_last=li
+
 print()
 print()
 
