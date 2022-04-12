@@ -146,6 +146,11 @@ print(f"\nCosine Results:\n{cosine_results}\nMax val: {max_cosine_result}\n\n")
 # Document3,0,7,0,2,1,0,0,3,0,0
 # Document4,0,1,0,0,1,2,2,0,3,0
 
+def minkowski_distance(X,Y):
+    distance = 0
+    for i in range(len(X)):
+        distance += pow(abs(X[i]-Y[i]), 3)
+    return pow(distance, 1/3)
 
 df = pd.read_csv("./data.csv", names=['Document', 'Team', 'Coach', 'Hockey', 'Baseball', 'Soccer', 'Penalty', 'Score', 'Win', 'Loss', 'Season'])
 manhattan_results, euclidean_results, supremum_results, cosine_results, minkowski_results = defaultdict(dict),defaultdict(dict),defaultdict(dict),defaultdict(dict), defaultdict(dict)
