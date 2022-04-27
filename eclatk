@@ -1,5 +1,4 @@
 from itertools import combinations
-
 def get_data():
     return [
         ['T100',['I1','I2','I5']],
