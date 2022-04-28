@@ -1,0 +1,119 @@
+from itertools import combinations
+
+def get_data():
+    return [
+        ['T100',['I1','I2','I5']],
+        ['T200',['I2','I4']],
+        ['T300',['I2','I3']],
+        ['T400',['I1','I2','I4']],
+        ['T500',['I1','I3']],
+        ['T600',['I2','I3']],
+        ['T700',['I1','I3']],
+        ['T800',['I1','I2','I3','I5']],
+        ['T900',['I1','I2','I3']]
+        ]
+
+data=get_data()
+
+items = []
+for i in data:
+    for q in i[1]:
+        if(q not in items):
+            items.append(q)
+
+items.sort()
+
+min_supp_perc = 0.3
+min_supp = int(min_supp_perc*len(data))
+print(min_supp)
+
+c1,l1={},{}
+for i in items:
+    curr=0
+    for row in data:
+        if(i in row[1]):
+            curr+=1
+    c1[(i,)]=curr
+
+print('C1')
+for itm,val in c1.items():
+    print(itm,":",val)
+
+for itm,val in c1.items():
+    if(val>=min_supp):
+        l1[itm]=val
+        
+print('L1')
+for itm,val in l1.items():
+    print(itm,":",val)
+print()
+
+def stage_k(l_last):
+    c_keys=list(l_last.keys())
+    n=len(c_keys)
+    
+    ck,lk={},{}
+    for i in range(n-1):
+        for j in range(i+1,n):
+            if(c_keys[i][:-1]==c_keys[j][:-1]):
+                count=0
+                
+                curr=tuple(list(c_keys[i])+[c_keys[j][-1]])
+                for iter2 in data:
+                    if set(curr).issubset(set(iter2[1])):
+                        count+=1
+                ck[curr] = count
+        
+    for itm in ck:
+        if(ck[itm]>=min_supp):
+            lk[itm]=ck[itm]
+    
+    return ck,lk
+
+max_freq_size=max([len(i[1]) for i in data])
+l_last=l1
+
+min_conf_perc = 0.5
+for i in range(2,max_freq_size+1):
+    ci,li=stage_k(l_last)
+    
+    print('C'+str(i))
+    for itm,val in ci.items():
+        print(itm,":",val)
+        
+    if(not li):
+        break
+    
+    print('L%d' %(i))
+    for itm,val in li.items():
+        print(itm,":",val)
+        
+    print()
+    l_last=li
+print()
+print()
+
+for l in l_last:
+    for lsize in range(1,(len(l)//2)+1):
+        c = list(combinations(l,lsize))
+        for a in c:
+            b = set(l)-set(a)
+            ab = l
+            sab = 0
+            sa = 0
+            sb = 0
+            for q in data:
+                temp = set(q[1])
+                if(set(a).issubset(temp)):
+                    sa+=1
+                if(set(b).issubset(temp)):
+                    sb+=1
+                if(set(ab).issubset(temp)):
+                    sab+=1
+            
+            if(sab/sa>=min_conf_perc):
+                print(a," -> ",b," = ",str(sab/sa*100)+"%")
+            if(sab/sb>=min_conf_perc):
+                print(b," -> ",a," = "+str(sab/sb*100)+"%")
+    print()
+    
